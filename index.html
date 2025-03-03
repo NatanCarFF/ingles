@@ -7,51 +7,59 @@
     <style>
         body {
             font-family: 'Comic Sans MS', cursive, sans-serif;
-            background-color: #f1f1f1;
+            background-color: #f9f9f9;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             flex-direction: column;
+            padding: 10px;
         }
+
         .container {
             text-align: center;
             background-color: #fff;
-            padding: 40px;
+            padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 700px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
         }
+
         h1 {
             color: #FF5722;
-            font-size: 2.5em;
+            font-size: 2.4em;
             margin-bottom: 20px;
         }
+
         .score {
             font-size: 1.8em;
             color: #4CAF50;
             margin-bottom: 20px;
         }
+
         .question {
-            font-size: 1.8em;
+            font-size: 1.5em;
             margin: 20px 0;
             color: #2196F3;
         }
+
         .options {
             list-style-type: none;
             padding: 0;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 15px;
+            margin-top: 20px;
         }
+
         .options li {
             background-color: #007BFF;
             color: white;
-            padding: 15px;
+            padding: 20px;
             margin: 10px 0;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             font-size: 1.4em;
             transition: background-color 0.3s ease, transform 0.3s ease;
@@ -60,32 +68,34 @@
             justify-content: center;
             flex-direction: column;
         }
+
         .options li:hover {
             background-color: #0056b3;
             transform: scale(1.05);
         }
+
         .options li.correct {
-            background-color: green !important;
+            background-color: #4CAF50 !important;
         }
+
         .options li.incorrect {
-            background-color: red !important;
+            background-color: #FF5722 !important;
         }
-        .options img {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 10px;
-        }
+
         .feedback {
             margin-top: 20px;
-            font-size: 1.4em;
+            font-size: 1.5em;
             font-weight: bold;
         }
+
         .feedback.correct {
             color: green;
         }
+
         .feedback.incorrect {
             color: red;
         }
+
         .btn {
             background-color: #FF5722;
             color: white;
@@ -95,19 +105,95 @@
             cursor: pointer;
             font-size: 1.5em;
             transition: background-color 0.3s ease;
+            margin-top: 20px;
         }
+
         .btn:hover {
             background-color: #E64A19;
         }
+
         footer {
             text-align: center;
             margin-top: 20px;
             font-size: 1.2em;
             color: #333;
         }
+
         footer a {
             color: #FF5722;
             text-decoration: none;
+        }
+
+        /* Responsividade para telas pequenas */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .score {
+                font-size: 1.6em;
+            }
+
+            .question {
+                font-size: 1.4em;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+
+            .options li {
+                font-size: 1.3em;
+                padding: 15px;
+            }
+
+            .feedback {
+                font-size: 1.3em;
+            }
+
+            .btn {
+                font-size: 1.4em;
+                padding: 12px 25px;
+            }
+        }
+
+        /* Responsividade para telas muito pequenas (dispositivos como celulares) */
+        @media (max-width: 400px) {
+            .container {
+                width: 100%;
+                max-width: 350px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .score {
+                font-size: 1.4em;
+            }
+
+            .question {
+                font-size: 1.3em;
+            }
+
+            .options li {
+                font-size: 1.2em;
+                padding: 12px;
+            }
+
+            .feedback {
+                font-size: 1.2em;
+            }
+
+            .btn {
+                font-size: 1.3em;
+                padding: 10px 20px;
+            }
         }
     </style>
 </head>
@@ -131,14 +217,290 @@
 
     <script>
         const words = [
-            { word: "dog", translation: "Cachorro", emoji: "🐕" },
-            { word: "cat", translation: "Gato", emoji: "🐈" },
-            { word: "apple", translation: "Maçã", emoji: "🍎" },
-            { word: "car", translation: "Carro", emoji: "🚗" },
-            { word: "house", translation: "Casa", emoji: "🏠" },
-            { word: "book", translation: "Livro", emoji: "📚" },
-            { word: "tree", translation: "Árvore", emoji: "🌳" },
-            { word: "ball", translation: "Bola", emoji: "⚽" }
+            { word: "apple", translation: "maçã", emoji: "🍎" },
+			{ word: "banana", translation: "banana", emoji: "🍌" },
+			{ word: "car", translation: "carro", emoji: "🚗" },
+			{ word: "dog", translation: "cachorro", emoji: "🐶" },
+			{ word: "cat", translation: "gato", emoji: "🐱" },
+			{ word: "house", translation: "casa", emoji: "🏠" },
+			{ word: "tree", translation: "árvore", emoji: "🌳" },
+			{ word: "fish", translation: "peixe", emoji: "🐟" },
+			{ word: "sun", translation: "sol", emoji: "🌞" },
+			{ word: "moon", translation: "lua", emoji: "🌙" },
+			{ word: "star", translation: "estrela", emoji: "⭐" },
+			{ word: "ball", translation: "bola", emoji: "⚽" },
+			{ word: "bird", translation: "pássaro", emoji: "🦜" },
+			{ word: "elephant", translation: "elefante", emoji: "🐘" },
+			{ word: "giraffe", translation: "girafa", emoji: "🦒" },
+			{ word: "computer", translation: "computador", emoji: "💻" },
+			{ word: "phone", translation: "telefone", emoji: "📱" },
+			{ word: "book", translation: "livro", emoji: "📚" },
+			{ word: "pen", translation: "caneta", emoji: "🖊️" },
+			{ word: "light", translation: "luz", emoji: "💡" },
+			{ word: "balloon", translation: "balão", emoji: "🎈" },
+			{ word: "cake", translation: "bolo", emoji: "🎂" },
+			{ word: "rain", translation: "chuva", emoji: "🌧️" },
+			{ word: "cloud", translation: "nuvem", emoji: "☁️" },
+			{ word: "school", translation: "escola", emoji: "🏫" },
+			{ word: "teacher", translation: "professor", emoji: "👨‍🏫" },
+			{ word: "student", translation: "estudante", emoji: "👩‍🎓" },
+			{ word: "clock", translation: "relógio", emoji: "🕰️" },
+			{ word: "milk", translation: "leite", emoji: "🥛" },
+			{ word: "water", translation: "água", emoji: "💧" },
+			{ word: "banana", translation: "banana", emoji: "🍌" },
+			{ word: "carrot", translation: "cenoura", emoji: "🥕" },
+			{ word: "computer", translation: "computador", emoji: "💻" },
+			{ word: "glove", translation: "luva", emoji: "🧤" },
+			{ word: "hat", translation: "chapéu", emoji: "🎩" },
+			{ word: "shoes", translation: "sapatos", emoji: "👟" },
+			{ word: "coat", translation: "casaco", emoji: "🧥" },
+			{ word: "apple", translation: "maçã", emoji: "🍎" },
+			{ word: "orange", translation: "laranja", emoji: "🍊" },
+			{ word: "grape", translation: "uva", emoji: "🍇" },
+			{ word: "pineapple", translation: "abacaxi", emoji: "🍍" },
+			{ word: "lemon", translation: "limão", emoji: "🍋" },
+			{ word: "peach", translation: "pêssego", emoji: "🍑" },
+			{ word: "pear", translation: "pêra", emoji: "🍐" },
+			{ word: "watermelon", translation: "melancia", emoji: "🍉" },
+			{ word: "strawberry", translation: "morango", emoji: "🍓" },
+    { word: "cherry", translation: "cereja", emoji: "🍒" },
+    { word: "plum", translation: "ameixa", emoji: "🍑" },
+    { word: "mango", translation: "manga", emoji: "🥭" },
+    { word: "tangerine", translation: "tangerina", emoji: "🍊" },
+    { word: "kiwi", translation: "kiwi", emoji: "🥝" },
+    { word: "pomegranate", translation: "romã", emoji: "🍎" },
+    { word: "peach", translation: "pêssego", emoji: "🍑" },
+    { word: "avocado", translation: "abacate", emoji: "🥑" },
+    { word: "tomato", translation: "tomate", emoji: "🍅" },
+    { word: "onion", translation: "cebola", emoji: "🧅" },
+    { word: "lettuce", translation: "alface", emoji: "🥬" },
+    { word: "cucumber", translation: "pepino", emoji: "🥒" },
+    { word: "eggplant", translation: "berinjela", emoji: "🍆" },
+    { word: "carrot", translation: "cenoura", emoji: "🥕" },
+    { word: "spinach", translation: "espinafre", emoji: "🍃" },
+    { word: "broccoli", translation: "brócolis", emoji: "🥦" },
+    { word: "potato", translation: "batata", emoji: "🥔" },
+    { word: "asparagus", translation: "espargos", emoji: "🥬" },
+    { word: "pumpkin", translation: "abóbora", emoji: "🎃" },
+    { word: "cabbage", translation: "repolho", emoji: "🥬" },
+    { word: "soup", translation: "sopa", emoji: "🍲" },
+    { word: "bread", translation: "pão", emoji: "🍞" },
+    { word: "cheese", translation: "queijo", emoji: "🧀" },
+    { word: "butter", translation: "manteiga", emoji: "🧈" },
+    { word: "jam", translation: "geleia", emoji: "🍇" },
+    { word: "honey", translation: "mel", emoji: "🍯" },
+    { word: "salt", translation: "sal", emoji: "🧂" },
+    { word: "pepper", translation: "pimenta", emoji: "🌶️" },
+    { word: "oil", translation: "óleo", emoji: "🛢️" },
+    { word: "vinegar", translation: "vinagre", emoji: "🍶" },
+    { word: "sugar", translation: "açúcar", emoji: "🍬" },
+    { word: "coffee", translation: "café", emoji: "☕" },
+    { word: "tea", translation: "chá", emoji: "🍵" },
+    { word: "milk", translation: "leite", emoji: "🥛" },
+    { word: "water", translation: "água", emoji: "💧" },
+    { word: "juice", translation: "suco", emoji: "🧃" },
+    { word: "soda", translation: "refrigerante", emoji: "🥤" },
+    { word: "wine", translation: "vinho", emoji: "🍷" },
+    { word: "beer", translation: "cerveja", emoji: "🍺" },
+    { word: "champagne", translation: "champanhe", emoji: "🍾" },
+    { word: "cocktail", translation: "coquetel", emoji: "🍸" },
+    { word: "ice", translation: "gelo", emoji: "🧊" },
+    { word: "cake", translation: "bolo", emoji: "🍰" },
+    { word: "cookie", translation: "biscoito", emoji: "🍪" },
+    { word: "pie", translation: "torta", emoji: "🥧" },
+    { word: "chocolate", translation: "chocolate", emoji: "🍫" },
+    { word: "donut", translation: "rosquinha", emoji: "🍩" },
+    { word: "pasta", translation: "massa", emoji: "🍝" },
+    { word: "pizza", translation: "pizza", emoji: "🍕" },
+    { word: "burger", translation: "hambúrguer", emoji: "🍔" },
+    { word: "fries", translation: "batata frita", emoji: "🍟" },
+	    { word: "airplane", translation: "avião", emoji: "✈️" },
+    { word: "train", translation: "trem", emoji: "🚂" },
+    { word: "bicycle", translation: "bicicleta", emoji: "🚲" },
+    { word: "bus", translation: "ônibus", emoji: "🚌" },
+    { word: "ship", translation: "navio", emoji: "🚢" },
+    { word: "motorcycle", translation: "motocicleta", emoji: "🏍️" },
+    { word: "boat", translation: "barco", emoji: "⛴️" },
+    { word: "rocket", translation: "foguete", emoji: "🚀" },
+    { word: "hotdog", translation: "cachorro quente", emoji: "🌭" },
+    { word: "hamburger", translation: "hambúrguer", emoji: "🍔" },
+    { word: "pizza", translation: "pizza", emoji: "🍕" },
+    { word: "taco", translation: "taco", emoji: "🌮" },
+    { word: "sushi", translation: "sushi", emoji: "🍣" },
+    { word: "noodles", translation: "macarrão", emoji: "🍜" },
+    { word: "cheeseburger", translation: "cheeseburger", emoji: "🍔" },
+    { word: "popcorn", translation: "pipoca", emoji: "🍿" },
+    { word: "salad", translation: "salada", emoji: "🥗" },
+    { word: "cupcake", translation: "cupcake", emoji: "🧁" },
+    { word: "chocolate", translation: "chocolate", emoji: "🍫" },
+    { word: "cookie", translation: "biscoito", emoji: "🍪" },
+    { word: "ice cream", translation: "sorvete", emoji: "🍦" },
+    { word: "cake", translation: "bolo", emoji: "🎂" },
+    { word: "candy", translation: "doce", emoji: "🍬" },
+    { word: "fruit", translation: "fruta", emoji: "🍉" },
+    { word: "apple", translation: "maçã", emoji: "🍎" },
+    { word: "banana", translation: "banana", emoji: "🍌" },
+    { word: "grape", translation: "uva", emoji: "🍇" },
+    { word: "pineapple", translation: "abacaxi", emoji: "🍍" },
+    { word: "lemon", translation: "limão", emoji: "🍋" },
+    { word: "watermelon", translation: "melancia", emoji: "🍉" },
+    { word: "cherry", translation: "cereja", emoji: "🍒" },
+    { word: "peach", translation: "pêssego", emoji: "🍑" },
+    { word: "orange", translation: "laranja", emoji: "🍊" },
+    { word: "pear", translation: "pêra", emoji: "🍐" },
+    { word: "melon", translation: "melão", emoji: "🍈" },
+    { word: "mango", translation: "manga", emoji: "🥭" },
+    { word: "kiwi", translation: "kiwi", emoji: "🥝" },
+    { word: "avocado", translation: "abacate", emoji: "🥑" },
+    { word: "plum", translation: "ameixa", emoji: "🍑" },
+    { word: "grapefruit", translation: "toranja", emoji: "🍊" },
+    { word: "apricot", translation: "damasco", emoji: "🍑" },
+    { word: "strawberry", translation: "morango", emoji: "🍓" },
+    { word: "raspberry", translation: "framboesa", emoji: "🍇" },
+    { word: "blackberry", translation: "amora", emoji: "🍇" },
+    { word: "carrot", translation: "cenoura", emoji: "🥕" },
+    { word: "potato", translation: "batata", emoji: "🥔" },
+    { word: "onion", translation: "cebola", emoji: "🧅" },
+    { word: "tomato", translation: "tomate", emoji: "🍅" },
+    { word: "lettuce", translation: "alface", emoji: "🥬" },
+    { word: "cucumber", translation: "pepino", emoji: "🥒" },
+    { word: "spinach", translation: "espinafre", emoji: "🍃" },
+    { word: "broccoli", translation: "brócolis", emoji: "🥦" },
+    { word: "asparagus", translation: "espargos", emoji: "🥬" },
+    { word: "pumpkin", translation: "abóbora", emoji: "🎃" },
+    { word: "eggplant", translation: "berinjela", emoji: "🍆" },
+    { word: "cabbage", translation: "repolho", emoji: "🥬" },
+    { word: "mushroom", translation: "cogumelo", emoji: "🍄" },
+    { word: "peas", translation: "ervilhas", emoji: "🌱" },
+    { word: "rice", translation: "arroz", emoji: "🍚" },
+    { word: "bread", translation: "pão", emoji: "🍞" },
+    { word: "cheese", translation: "queijo", emoji: "🧀" },
+    { word: "butter", translation: "manteiga", emoji: "🧈" },
+    { word: "jam", translation: "geleia", emoji: "🍇" },
+    { word: "honey", translation: "mel", emoji: "🍯" },
+    { word: "sugar", translation: "açúcar", emoji: "🍬" },
+    { word: "oil", translation: "óleo", emoji: "🛢️" },
+    { word: "vinegar", translation: "vinagre", emoji: "🍶" },
+    { word: "salt", translation: "sal", emoji: "🧂" },
+    { word: "pepper", translation: "pimenta", emoji: "🌶️" },
+    { word: "coffee", translation: "café", emoji: "☕" },
+    { word: "tea", translation: "chá", emoji: "🍵" },
+    { word: "milk", translation: "leite", emoji: "🥛" },
+    { word: "water", translation: "água", emoji: "💧" },
+    { word: "juice", translation: "suco", emoji: "🧃" },
+    { word: "soda", translation: "refrigerante", emoji: "🥤" },
+    { word: "wine", translation: "vinho", emoji: "🍷" },
+    { word: "beer", translation: "cerveja", emoji: "🍺" },
+    { word: "champagne", translation: "champanhe", emoji: "🍾" },
+    { word: "cocktail", translation: "coquetel", emoji: "🍸" },
+    { word: "ice", translation: "gelo", emoji: "🧊" },
+    { word: "soda", translation: "refrigerante", emoji: "🥤" },
+    { word: "champagne", translation: "champanhe", emoji: "🍾" },
+    { word: "watermelon", translation: "melancia", emoji: "🍉" },
+    { word: "cucumber", translation: "pepino", emoji: "🥒" },
+    { word: "bottle", translation: "garrafa", emoji: "🍾" },
+    { word: "plate", translation: "prato", emoji: "🍽️" },
+    { word: "knife", translation: "faca", emoji: "🔪" },
+    { word: "fork", translation: "garfo", emoji: "🍴" },
+    { word: "spoon", translation: "colher", emoji: "🥄" },
+    { word: "glass", translation: "taça", emoji: "🍷" },
+    { word: "towel", translation: "toalha", emoji: "🧴" },
+    { word: "pillow", translation: "travesseiro", emoji: "🛏️" },
+    { word: "blanket", translation: "cobertor", emoji: "🛏️" },
+    { word: "bed", translation: "cama", emoji: "🛏️" },
+    { word: "chair", translation: "cadeira", emoji: "🪑" },
+    { word: "table", translation: "mesa", emoji: "🪑" },
+    { word: "sofa", translation: "sofá", emoji: "🛋️" },
+    { word: "rug", translation: "tapete", emoji: "🛋️" },
+    { word: "closet", translation: "guarda-roupa", emoji: "🧥" },
+	    { word: "tree", translation: "árvore", emoji: "🌳" },
+    { word: "dog", translation: "cachorro", emoji: "🐕" },
+    { word: "cat", translation: "gato", emoji: "🐱" },
+    { word: "fish", translation: "peixe", emoji: "🐟" },
+    { word: "bird", translation: "pássaro", emoji: "🐦" },
+    { word: "horse", translation: "cavalo", emoji: "🐴" },
+    { word: "elephant", translation: "elefante", emoji: "🐘" },
+    { word: "tiger", translation: "tigre", emoji: "🐯" },
+    { word: "lion", translation: "leão", emoji: "🦁" },
+    { word: "monkey", translation: "macaco", emoji: "🐒" },
+    { word: "cow", translation: "vaca", emoji: "🐄" },
+    { word: "sheep", translation: "ovelha", emoji: "🐑" },
+    { word: "goat", translation: "cabra", emoji: "🐐" },
+    { word: "pig", translation: "porco", emoji: "🐖" },
+    { word: "chicken", translation: "galinha", emoji: "🐔" },
+    { word: "duck", translation: "pato", emoji: "🦆" },
+    { word: "rabbit", translation: "coelho", emoji: "🐇" },
+    { word: "snake", translation: "cobra", emoji: "🐍" },
+    { word: "kangaroo", translation: "canguru", emoji: "🦘" },
+    { word: "koala", translation: "coala", emoji: "🦝" },
+    { word: "panda", translation: "panda", emoji: "🐼" },
+    { word: "wolf", translation: "lobo", emoji: "🐺" },
+    { word: "frog", translation: "sapo", emoji: "🐸" },
+    { word: "spider", translation: "aranha", emoji: "🕷️" },
+    { word: "bee", translation: "abelha", emoji: "🐝" },
+    { word: "butterfly", translation: "borboleta", emoji: "🦋" },
+    { word: "ant", translation: "formiga", emoji: "🐜" },
+    { word: "ladybug", translation: "joaninha", emoji: "🐞" },
+    { word: "scorpion", translation: "escorpião", emoji: "🦂" },
+    { word: "octopus", translation: "polvo", emoji: "🐙" },
+    { word: "jellyfish", translation: "medusa", emoji: "🐙" },
+    { word: "shark", translation: "tubarão", emoji: "🦈" },
+    { word: "whale", translation: "baleia", emoji: "🐋" },
+    { word: "dolphin", translation: "golfinho", emoji: "🐬" },
+    { word: "starfish", translation: "estrela do mar", emoji: "🌟" },
+    { word: "bat", translation: "morcego", emoji: "🦇" },
+    { word: "crocodile", translation: "crocodilo", emoji: "🐊" },
+    { word: "alligators", translation: "jacaré", emoji: "🐊" },
+    { word: "parrot", translation: "papagaio", emoji: "🦜" },
+    { word: "ostrich", translation: "avestruz", emoji: "🦢" },
+    { word: "penguin", translation: "pinguim", emoji: "🐧" },
+    { word: "flamingo", translation: "flamingo", emoji: "🦩" },
+    { word: "peacock", translation: "pavão", emoji: "🦚" },
+    { word: "toucan", translation: "tucano", emoji: "🦜" },
+    { word: "vulture", translation: "abutre", emoji: "🦅" },
+    { word: "bat", translation: "morcego", emoji: "🦇" },
+    { word: "owl", translation: "coruja", emoji: "🦉" },
+    { word: "owl", translation: "coruja", emoji: "🦉" },
+    { word: "bee", translation: "abelha", emoji: "🐝" },
+    { word: "frog", translation: "sapo", emoji: "🐸" },
+    { word: "wolf", translation: "lobo", emoji: "🐺" },
+    { word: "mouse", translation: "rato", emoji: "🐭" },
+    { word: "cat", translation: "gato", emoji: "🐱" },
+    { word: "dog", translation: "cachorro", emoji: "🐶" },
+    { word: "horse", translation: "cavalo", emoji: "🐴" },
+    { word: "rabbit", translation: "coelho", emoji: "🐇" },
+    { word: "snake", translation: "cobra", emoji: "🐍" },
+    { word: "cow", translation: "vaca", emoji: "🐄" },
+    { word: "lion", translation: "leão", emoji: "🦁" },
+    { word: "zebra", translation: "zebra", emoji: "🦓" },
+    { word: "tiger", translation: "tigre", emoji: "🐯" },
+    { word: "elephant", translation: "elefante", emoji: "🐘" },
+    { word: "ant", translation: "formiga", emoji: "🐜" },
+    { word: "deer", translation: "veado", emoji: "🦌" },
+    { word: "butterfly", translation: "borboleta", emoji: "🦋" },
+    { word: "mouse", translation: "rato", emoji: "🐭" },
+    { word: "bat", translation: "morcego", emoji: "🦇" },
+    { word: "bird", translation: "pássaro", emoji: "🐦" },
+    { word: "frog", translation: "sapo", emoji: "🐸" },
+    { word: "duck", translation: "pato", emoji: "🦆" },
+    { word: "duck", translation: "pato", emoji: "🦆" },
+    { word: "peacock", translation: "pavão", emoji: "🦚" },
+    { word: "parrot", translation: "papagaio", emoji: "🦜" },
+    { word: "chicken", translation: "galinha", emoji: "🐔" },
+    { word: "goose", translation: "ganso", emoji: "🦢" },
+    { word: "pigeon", translation: "pombo", emoji: "🕊️" },
+    { word: "hawk", translation: "falcão", emoji: "🦅" },
+    { word: "eagle", translation: "águia", emoji: "🦅" },
+    { word: "rooster", translation: "galo", emoji: "🐓" },
+    { word: "parrot", translation: "papagaio", emoji: "🦜" },
+    { word: "owl", translation: "coruja", emoji: "🦉" },
+    { word: "beetle", translation: "besouro", emoji: "🐞" },
+    { word: "spider", translation: "aranha", emoji: "🕷️" },
+    { word: "scorpion", translation: "escorpião", emoji: "🦂" },
+    { word: "ant", translation: "formiga", emoji: "🐜" },
+    { word: "ladybug", translation: "joaninha", emoji: "🐞" },
+    { word: "beetle", translation: "besouro", emoji: "🐞" },
+    { word: "grasshopper", translation: "gafanhoto", emoji: "🦗" }
         ];
 
         let currentQuestion = 0;
@@ -153,7 +515,7 @@
             const correctAnswer = words[currentQuestion].translation;
             const incorrectAnswers = getIncorrectAnswers(words[currentQuestion]);
 
-            // Pegue 4 respostas incorretas aleatórias e combine com a correta
+            // Combina as respostas corretas e incorretas
             const options = [correctAnswer, ...incorrectAnswers];
             const shuffledOptions = shuffleArray(options);
 
@@ -161,7 +523,7 @@
             const optionsList = document.getElementById('options');
             optionsList.innerHTML = '';  // Limpa as opções anteriores
 
-            shuffledOptions.forEach(option => {
+            shuffledOptions.slice(0, 4).forEach(option => {  // Limite de 4 opções
                 const li = document.createElement('li');
                 
                 // Encontre o emoji correspondente
@@ -187,12 +549,12 @@
             return array;
         }
 
-        // Função para pegar 4 respostas incorretas aleatórias
+        // Função para pegar 3 respostas incorretas aleatórias
         function getIncorrectAnswers(correctWord) {
             const incorrectAnswers = [];
             // Pega palavras diferentes da palavra correta
             const availableWords = words.filter(word => word.translation !== correctWord.translation);
-            while (incorrectAnswers.length < 4) {
+            while (incorrectAnswers.length < 3) {  // Limite de 3 respostas incorretas
                 const randomWord = availableWords[Math.floor(Math.random() * availableWords.length)].translation;
                 if (!incorrectAnswers.includes(randomWord)) {
                     incorrectAnswers.push(randomWord);
@@ -228,16 +590,10 @@
                 score++;
                 document.getElementById('score').textContent = score;
 
-                if (score >= 25) {
-                    window.location.href = "https://natancarff.github.io/inglesnv2/"; // Redireciona para o Google
-                }
-
                 highlightAnswer(true);
             } else {
                 feedback.textContent = "Resposta errada. Tente novamente!";
                 feedback.classList.add('incorrect');
-                score = 0;  // Zera a pontuação
-                document.getElementById('score').textContent = score; // Atualiza a pontuação
                 highlightAnswer(false);
             }
         }
@@ -260,18 +616,16 @@
         // Avança para a próxima pergunta
         function nextQuestion() {
             currentQuestion = (currentQuestion + 1) % words.length;
-            document.getElementById('feedback').textContent = "";
+            document.getElementById('feedback').textContent = '';
             updateQuestion();
             playAudio();
         }
 
         // Inicializa o jogo
-        function startGame() {
-            updateQuestion();  // Exibe a primeira pergunta
-            playAudio();       // Toca o áudio da primeira palavra
-        }
-
-        startGame();  // Inicia o jogo com a primeira palavra
+        window.onload = function() {
+            updateQuestion();
+            playAudio();
+        };
     </script>
 </body>
 </html>
