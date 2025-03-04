@@ -6,7 +6,7 @@
     <title>Jogo de Inglês - Aprendendo com Quiz</title>
     <style>
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-family: 'Arial', sans-serif;  /* Alterado para uma fonte mais legível */
             background-color: #f9f9f9;
             display: flex;
             justify-content: center;
@@ -27,22 +27,17 @@
             max-width: 500px;
         }
 
-        h1 {
-            color: #FF5722;
-            font-size: 2.4em;
-            margin-bottom: 20px;
-        }
-
-        .score {
-            font-size: 1.8em;
-            color: #4CAF50;
+        .question-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-bottom: 20px;
         }
 
         .question {
             font-size: 1.5em;
-            margin: 20px 0;
             color: #2196F3;
+            margin-right: 15px;
         }
 
         .options {
@@ -130,14 +125,6 @@
                 padding: 20px;
             }
 
-            h1 {
-                font-size: 2em;
-            }
-
-            .score {
-                font-size: 1.6em;
-            }
-
             .question {
                 font-size: 1.4em;
             }
@@ -169,14 +156,6 @@
                 padding: 15px;
             }
 
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .score {
-                font-size: 1.4em;
-            }
-
             .question {
                 font-size: 1.3em;
             }
@@ -199,16 +178,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>Jogo de Inglês - Quiz Interativo</h1>
-        <div class="score">
-            Pontuação: <span id="score">0</span>
+        <div class="question-container">
+            <div class="question" id="question">Clique no botão para ouvir a palavra em inglês</div>
+            <button class="btn" id="repeat-button" onclick="repeatQuestion()">🎵</button>
         </div>
-        <div class="question" id="question">Clique no botão para ouvir a palavra em inglês</div>
         <ul class="options" id="options">
             <!-- As opções serão preenchidas dinamicamente -->
         </ul>
         <div class="feedback" id="feedback"></div>
-        <button class="btn" onclick="nextQuestion()">Próxima Palavra</button>
+        <button class="btn" id="next-button" onclick="nextQuestion()">Próxima Palavra</button>
     </div>
 
     <footer>
@@ -216,6 +194,7 @@
     </footer>
 
     <script>
+        const words = [
         const words = [
             { word: "apple", translation: "maçã", emoji: "🍎" },
 			{ word: "banana", translation: "banana", emoji: "🍌" },
@@ -263,10 +242,10 @@
 			{ word: "pear", translation: "pêra", emoji: "🍐" },
 			{ word: "watermelon", translation: "melancia", emoji: "🍉" },
 			{ word: "strawberry", translation: "morango", emoji: "🍓" },
-    { word: "cherry", translation: "cereja", emoji: "🍒" },
-    { word: "plum", translation: "ameixa", emoji: "🍑" },
-    { word: "mango", translation: "manga", emoji: "🥭" },
-    { word: "tangerine", translation: "tangerina", emoji: "🍊" },
+  			{ word: "cherry", translation: "cereja", emoji: "🍒" },
+    			{ word: "plum", translation: "ameixa", emoji: "🍑" },
+    			{ word: "mango", translation: "manga", emoji: "🥭" },
+    			{ word: "tangerine", translation: "tangerina", emoji: "🍊" },
     { word: "kiwi", translation: "kiwi", emoji: "🥝" },
     { word: "pomegranate", translation: "romã", emoji: "🍎" },
     { word: "peach", translation: "pêssego", emoji: "🍑" },
@@ -413,7 +392,7 @@
     { word: "sofa", translation: "sofá", emoji: "🛋️" },
     { word: "rug", translation: "tapete", emoji: "🛋️" },
     { word: "closet", translation: "guarda-roupa", emoji: "🧥" },
-	    { word: "tree", translation: "árvore", emoji: "🌳" },
+		{ word: "tree", translation: "árvore", emoji: "🌳" },
     { word: "dog", translation: "cachorro", emoji: "🐕" },
     { word: "cat", translation: "gato", emoji: "🐱" },
     { word: "fish", translation: "peixe", emoji: "🐟" },
@@ -504,13 +483,12 @@
         ];
 
         let currentQuestion = 0;
-        let score = 0;
 
-        // Atualiza a pergunta na tela
+        // Função para atualizar a pergunta na tela
         function updateQuestion() {
             const questionText = "Qual é a tradução da palavra: " + words[currentQuestion].word.charAt(0).toUpperCase() + words[currentQuestion].word.slice(1);
             document.getElementById('question').textContent = questionText;
-            
+
             // Embaralha as opções de resposta
             const correctAnswer = words[currentQuestion].translation;
             const incorrectAnswers = getIncorrectAnswers(words[currentQuestion]);
@@ -525,10 +503,10 @@
 
             shuffledOptions.slice(0, 4).forEach(option => {  // Limite de 4 opções
                 const li = document.createElement('li');
-                
+
                 // Encontre o emoji correspondente
                 const emoji = getEmojiForOption(option);
-                
+
                 li.innerHTML = `
                     <div style="font-size: 2em;">${emoji}</div>
                     ${option}
@@ -572,9 +550,32 @@
         // Reproduz a palavra usando a API SpeechSynthesis
         function playAudio() {
             const utterance = new SpeechSynthesisUtterance(words[currentQuestion].word);
-            utterance.lang = 'en-US';  // Definir para inglês (dos EUA), você pode mudar para outra língua
+            utterance.lang = 'en-US';  // Definir para inglês (dos EUA)
             utterance.pitch = 1; // Tonalidade da voz
             utterance.rate = 1;  // Velocidade da fala
+            speechSynthesis.speak(utterance);
+        }
+
+        // Função para narrar a resposta correta ou incorreta
+        function narrateResponse(isCorrect) {
+            const utterance = new SpeechSynthesisUtterance();
+            const voices = speechSynthesis.getVoices();
+            const femaleVoice = voices.find(voice => voice.name.includes("Google UK English Female") || voice.name.includes("Google US English Female"));
+
+            // Se a voz feminina foi encontrada
+            if (femaleVoice) {
+                utterance.voice = femaleVoice;
+            }
+
+            if (isCorrect) {
+                utterance.text = "Parabéns! Você acertou! Excelente trabalho!";
+            } else {
+                utterance.text = "Poxa, você errou. Não desanime, vamos tentar novamente!";
+            }
+
+            utterance.lang = 'pt-BR';  // Definir para português
+            utterance.pitch = 1.2;  // Tom um pouco mais animado
+            utterance.rate = 2.0;  // Aumenta a velocidade para mais rápido
             speechSynthesis.speak(utterance);
         }
 
@@ -585,32 +586,17 @@
             options.forEach(option => option.classList.remove('correct', 'incorrect'));  // Limpa as classes antigas
 
             if (answer === words[currentQuestion].translation) {
-                feedback.textContent = "Resposta correta!";
+                feedback.textContent = "Resposta correta! ✅";
                 feedback.classList.add('correct');
-                score++;
-                document.getElementById('score').textContent = score;
+                narrateResponse(true);  // Narrar resposta correta
 
-                highlightAnswer(true);
+                // Habilitar o botão "Próxima Palavra" após resposta correta
+                document.getElementById('next-button').style.pointerEvents = 'auto';  // Habilitar o botão
             } else {
-                feedback.textContent = "Resposta errada. Tente novamente!";
+                feedback.textContent = "Resposta errada. ❌ Tente novamente!";
                 feedback.classList.add('incorrect');
-                highlightAnswer(false);
+                narrateResponse(false);  // Narrar resposta incorreta
             }
-        }
-
-        // Destaca a resposta correta ou incorreta
-        function highlightAnswer(isCorrect) {
-            const options = document.querySelectorAll('.options li');
-            const correctAnswer = words[currentQuestion].translation;
-            options.forEach(option => {
-                if (option.textContent === correctAnswer) {
-                    if (isCorrect) {
-                        option.classList.add('correct');
-                    } else {
-                        option.classList.add('incorrect');
-                    }
-                }
-            });
         }
 
         // Avança para a próxima pergunta
@@ -619,6 +605,14 @@
             document.getElementById('feedback').textContent = '';
             updateQuestion();
             playAudio();
+
+            // Desabilitar o botão "Próxima Palavra"
+            document.getElementById('next-button').style.pointerEvents = 'none'; 
+        }
+
+        // Função para repetir a pergunta
+        function repeatQuestion() {
+            playAudio(); // Reproduz novamente a palavra
         }
 
         // Inicializa o jogo
