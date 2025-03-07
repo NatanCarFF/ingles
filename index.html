@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Inglês - Aprendendo com Quiz</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question {
+            font-size: 1.2em;
+            color: #2196F3;
+            margin-bottom: 15px;
+        }
+
+        .difficulty {
+            font-size: 1.1em;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #FF5722;
+        }
+
+        .options {
+            list-style-type: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Duas colunas */
+            gap: 8px;
+            margin-top: 20px;
+            width: 100%;
+            justify-items: center;
+        }
+
+        .options li {
+            background-color: #007BFF;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .options li:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        .options li.correct { background-color: #4CAF50 !important; }
+        .options li.incorrect { background-color: #FF5722 !important; }
+
+        .feedback {
+            margin-top: 10px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .btn {
+            background-color: #FF5722;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover { background-color: #E64A19; }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        footer a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsividade para telas pequenas */
+        @media (max-width: 600px) {
+            .question {
+                font-size: 1.1em;
+            }
+
+            .options {
+                grid-template-columns: 1fr; /* Em telas pequenas, as opções se empilham */
+                gap: 8px;
+                justify-items: center;
+            }
+
+            .options li {
+                font-size: 1.1em;
+                padding: 10px;
+            }
+
+            .btn {
+                font-size: 1.1em;
+                padding: 10px 20px;
+            }
+
+            footer {
+                font-size: 0.8em;
+            }
+
+            .container {
+                height: auto;
+                padding: 15px;
+                justify-content: flex-start;
+            }
+        }
+
+        /* Balão de aviso personalizado */
+        .level-up-notice {
+            background-color: #FFEB3B;
+            border-radius: 10px;
+            padding: 12px;
+            color: #333;
+            font-size: 1.1em;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Indicador de desempenho personalizado */
+        .performance {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            font-size: 1em;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .performance.low {
+            background-color: #FF5722;
+        }
+
+        .performance.medium {
+            background-color: #FFC107;
+        }
+
+        .performance.high {
+            background-color: #4CAF50;
+        }
+
+        /* Container do resultado final */
+        .final-result {
+            display: none;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="question" id="question">Clique no botão para ouvir a palavra</div>
+        <button class="btn" id="repeat-button">🎵 Ouvir</button>
+        <ul class="options" id="options"></ul>
+        <div class="difficulty" id="difficulty">Nível: Fácil</div>
+        <div class="feedback" id="feedback"></div>
+        <button class="btn" id="next-button" disabled>Próxima Palavra</button>
+        <div id="performance" class="performance"></div>
+        <div id="level-up-notice" class="level-up-notice">Você avançou para o próximo nível!</div>
+
+        <!-- Container do resultado final -->
+        <div class="final-result" id="final-result">
+            <div id="final-performance"></div>
+            <div id="final-accuracy"></div>
+            <button class="btn" id="restart-button">Reiniciar</button>
+        </div>
+    </div>
+
+    <footer>
+        Desenvolvido por <a href="https://www.instagram.com/natancarff/" target="_blank">Natanael Carvalho</a>
+    </footer>
+
+    <script>
+        // Categorize as palavras em três níveis de dificuldade
+        const wordsByDifficulty = {
+            easy: [
+{ word: "hello", translation: "olá", emoji: "👋" },
+{ word: "goodbye", translation: "adeus", emoji: "👋" },
+{ word: "please", translation: "por favor", emoji: "🙏" },
+{ word: "thank you", translation: "obrigado", emoji: "🙏" },
+{ word: "sorry", translation: "desculpe", emoji: "😞" },
+{ word: "yes", translation: "sim", emoji: "👍" },
+{ word: "no", translation: "não", emoji: "👎" },
+{ word: "good", translation: "bom", emoji: "👌" },
+{ word: "bad", translation: "ruim", emoji: "👎" },
+{ word: "please", translation: "por favor", emoji: "🙏" },
+{ word: "sorry", translation: "desculpe", emoji: "😞" },
+{ word: "help", translation: "ajuda", emoji: "🤲" },
+{ word: "name", translation: "nome", emoji: "📝" },
+{ word: "friend", translation: "amigo", emoji: "🤝" },
+{ word: "family", translation: "família", emoji: "👨‍👩‍👧‍👦" },
+{ word: "house", translation: "casa", emoji: "🏠" },
+{ word: "work", translation: "trabalho", emoji: "💼" },
+{ word: "school", translation: "escola", emoji: "🏫" },
+{ word: "eat", translation: "comer", emoji: "🍽️" },
+{ word: "drink", translation: "beber", emoji: "🥤" },
+{ word: "water", translation: "água", emoji: "💧" },
+{ word: "food", translation: "comida", emoji: "🍔" },
+{ word: "good morning", translation: "bom dia", emoji: "🌅" },
+{ word: "good night", translation: "boa noite", emoji: "🌙" },
+{ word: "how", translation: "como", emoji: "🤔" },
+{ word: "what", translation: "o que", emoji: "❓" },
+{ word: "where", translation: "onde", emoji: "📍" },
+{ word: "when", translation: "quando", emoji: "⏰" },
+{ word: "why", translation: "por que", emoji: "❓" },
+{ word: "I", translation: "eu", emoji: "👤" },
+{ word: "you", translation: "você", emoji: "👥" },
+{ word: "he", translation: "ele", emoji: "👨" },
+{ word: "she", translation: "ela", emoji: "👩" },
+{ word: "it", translation: "isso", emoji: "🤖" },
+{ word: "we", translation: "nós", emoji: "👫" },
+{ word: "they", translation: "eles", emoji: "👬" },
+{ word: "this", translation: "isto", emoji: "👉" },
+{ word: "that", translation: "aquilo", emoji: "👈" },
+{ word: "here", translation: "aqui", emoji: "📍" },
+{ word: "there", translation: "lá", emoji: "➡️" },
+{ word: "up", translation: "cima", emoji: "⬆️" },
+{ word: "down", translation: "baixo", emoji: "⬇️" },
+{ word: "left", translation: "esquerda", emoji: "⬅️" },
+{ word: "right", translation: "direita", emoji: "➡️" },
+{ word: "now", translation: "agora", emoji: "⏱️" },
+{ word: "later", translation: "depois", emoji: "⏳" },
+{ word: "today", translation: "hoje", emoji: "📅" },
+{ word: "yesterday", translation: "ontem", emoji: "🗓️" },
+{ word: "tomorrow", translation: "amanhã", emoji: "📆" },
+{ word: "goodbye", translation: "adeus", emoji: "👋" },
+{ word: "car", translation: "carro", emoji: "🚗" },
+{ word: "bus", translation: "ônibus", emoji: "🚌" },
+{ word: "train", translation: "trem", emoji: "🚆" },
+{ word: "plane", translation: "avião", emoji: "✈️" },
+{ word: "bike", translation: "bicicleta", emoji: "🚲" },
+{ word: "computer", translation: "computador", emoji: "💻" },
+{ word: "phone", translation: "telefone", emoji: "📱" },
+{ word: "television", translation: "televisão", emoji: "📺" },
+{ word: "book", translation: "livro", emoji: "📚" },
+{ word: "pen", translation: "caneta", emoji: "🖊️" },
+{ word: "paper", translation: "papel", emoji: "📝" },
+{ word: "window", translation: "janela", emoji: "🪟" },
+{ word: "door", translation: "porta", emoji: "🚪" },
+{ word: "room", translation: "quarto", emoji: "🛏️" },
+{ word: "kitchen", translation: "cozinha", emoji: "🍴" },
+{ word: "bathroom", translation: "banheiro", emoji: "🚿" },
+{ word: "bed", translation: "cama", emoji: "🛏️" },
+{ word: "sofa", translation: "sofá", emoji: "🛋️" },
+{ word: "table", translation: "mesa", emoji: "🪑" },
+{ word: "chair", translation: "cadeira", emoji: "🪑" },
+{ word: "light", translation: "luz", emoji: "💡" },
+{ word: "dark", translation: "escuro", emoji: "🌑" },
+{ word: "rain", translation: "chuva", emoji: "🌧️" },
+{ word: "snow", translation: "neve", emoji: "❄️" },
+{ word: "sun", translation: "sol", emoji: "🌞" },
+{ word: "wind", translation: "vento", emoji: "🌬️" },
+{ word: "hot", translation: "quente", emoji: "🌡️" },
+{ word: "cold", translation: "frio", emoji: "🥶" },
+{ word: "sleep", translation: "dormir", emoji: "💤" },
+{ word: "wake up", translation: "acordar", emoji: "⏰" },
+{ word: "work", translation: "trabalhar", emoji: "💼" },
+{ word: "study", translation: "estudar", emoji: "📚" },
+{ word: "read", translation: "ler", emoji: "📖" },
+{ word: "write", translation: "escrever", emoji: "✍️" },
+{ word: "speak", translation: "falar", emoji: "🗣️" },
+{ word: "listen", translation: "ouvir", emoji: "👂" },
+{ word: "watch", translation: "assistir", emoji: "👀" },
+{ word: "play", translation: "brincar", emoji: "🎮" },
+{ word: "sing", translation: "cantar", emoji: "🎤" },
+{ word: "dance", translation: "dançar", emoji: "💃" },
+{ word: "run", translation: "correr", emoji: "🏃" },
+{ word: "walk", translation: "andar", emoji: "🚶" },
+{ word: "jump", translation: "pular", emoji: "⛹️" },
+{ word: "cook", translation: "cozinhar", emoji: "🍳" },
+{ word: "clean", translation: "limpar", emoji: "🧹" },
+{ word: "buy", translation: "comprar", emoji: "💳" },
+{ word: "sell", translation: "vender", emoji: "💰" },
+{ word: "open", translation: "abrir", emoji: "🚪" },
+{ word: "close", translation: "fechar", emoji: "🔒" },
+{ word: "stop", translation: "parar", emoji: "🛑" },
+{ word: "go", translation: "ir", emoji: "➡️" },
+{ word: "start", translation: "começar", emoji: "🏁" },
+{ word: "finish", translation: "terminar", emoji: "✅" },
+{ word: "new", translation: "novo", emoji: "🆕" },
+{ word: "old", translation: "velho", emoji: "🕰️" },
+{ word: "young", translation: "jovem", emoji: "👶" },
+{ word: "old", translation: "velho", emoji: "👵" },
+{ word: "beautiful", translation: "bonito", emoji: "😍" },
+{ word: "ugly", translation: "feio", emoji: "👹" },
+{ word: "happy", translation: "feliz", emoji: "😊" },
+{ word: "sad", translation: "triste", emoji: "😔" },
+{ word: "angry", translation: "irritado", emoji: "😡" },
+{ word: "bored", translation: "entediado", emoji: "😑" },
+{ word: "tired", translation: "cansado", emoji: "😴" },
+{ word: "scared", translation: "assustado", emoji: "😨" },
+{ word: "surprised", translation: "surpreso", emoji: "😲" },
+{ word: "always", translation: "sempre", emoji: "🔁" },
+{ word: "never", translation: "nunca", emoji: "🚫" },
+{ word: "sometimes", translation: "às vezes", emoji: "🔄" },
+{ word: "usually", translation: "geralmente", emoji: "📅" },
+{ word: "maybe", translation: "talvez", emoji: "🤔" },
+{ word: "really", translation: "realmente", emoji: "😲" },
+{ word: "very", translation: "muito", emoji: "⭐" },
+{ word: "too", translation: "demais", emoji: "↗️" },
+{ word: "enough", translation: "suficiente", emoji: "✔️" },
+{ word: "more", translation: "mais", emoji: "➕" },
+{ word: "less", translation: "menos", emoji: "➖" },
+{ word: "different", translation: "diferente", emoji: "🔄" },
+{ word: "same", translation: "mesmo", emoji: "🔁" },
+{ word: "big", translation: "grande", emoji: "📏" },
+{ word: "small", translation: "pequeno", emoji: "📏" },
+{ word: "short", translation: "curto", emoji: "✂️" },
+{ word: "long", translation: "longo", emoji: "⏳" },
+{ word: "fast", translation: "rápido", emoji: "⚡" },
+{ word: "slow", translation: "lento", emoji: "🐢" },
+{ word: "early", translation: "cedo", emoji: "🌅" },
+{ word: "late", translation: "tarde", emoji: "⏰" },
+{ word: "near", translation: "perto", emoji: "📍" },
+{ word: "far", translation: "longe", emoji: "🌍" },
+{ word: "open", translation: "abrir", emoji: "🚪" },
+{ word: "close", translation: "fechar", emoji: "🔒" },
+{ word: "begin", translation: "começar", emoji: "🏁" },
+{ word: "end", translation: "terminar", emoji: "⏹️" },
+{ word: "live", translation: "viver", emoji: "🌎" },
+{ word: "die", translation: "morrer", emoji: "⚰️" },
+{ word: "want", translation: "querer", emoji: "💭" },
+{ word: "need", translation: "precisar", emoji: "🔑" },
+{ word: "like", translation: "gostar", emoji: "❤️" },
+{ word: "dislike", translation: "não gostar", emoji: "👎" },
+{ word: "love", translation: "amar", emoji: "💘" },
+{ word: "hate", translation: "odiar", emoji: "💣" },
+{ word: "understand", translation: "entender", emoji: "🤔" },
+{ word: "forget", translation: "esquecer", emoji: "❌" },
+{ word: "remember", translation: "lembrar", emoji: "🧠" },
+{ word: "believe", translation: "acreditar", emoji: "🙏" },
+{ word: "doubt", translation: "duvidar", emoji: "🤷" },
+{ word: "talk", translation: "falar", emoji: "🗣️" },
+{ word: "listen", translation: "ouvir", emoji: "👂" },
+{ word: "speak", translation: "falar", emoji: "🗣️" },
+{ word: "tell", translation: "contar", emoji: "📢" },
+{ word: "show", translation: "mostrar", emoji: "👀" },
+{ word: "ask", translation: "perguntar", emoji: "❓" },
+{ word: "answer", translation: "responder", emoji: "✔️" },
+{ word: "think", translation: "pensar", emoji: "🤔" },
+{ word: "know", translation: "saber", emoji: "🧠" },
+{ word: "believe", translation: "acreditar", emoji: "🙏" },
+{ word: "care", translation: "cuidar", emoji: "❤️" },
+{ word: "help", translation: "ajudar", emoji: "🤲" },
+{ word: "want", translation: "querer", emoji: "💭" },
+{ word: "need", translation: "precisar", emoji: "🔑" },
+{ word: "work", translation: "trabalhar", emoji: "💼" },
+{ word: "study", translation: "estudar", emoji: "📚" },
+{ word: "play", translation: "brincar", emoji: "🎮" },
+{ word: "cook", translation: "cozinhar", emoji: "🍳" },
+{ word: "clean", translation: "limpar", emoji: "🧹" },
+{ word: "buy", translation: "comprar", emoji: "💳" },
+{ word: "sell", translation: "vender", emoji: "💰" },
+{ word: "travel", translation: "viajar", emoji: "🌍" },
+{ word: "stay", translation: "ficar", emoji: "🏠" },
+{ word: "go", translation: "ir", emoji: "➡️" },
+{ word: "come", translation: "vir", emoji: "👈" },
+{ word: "arrive", translation: "chegar", emoji: "🛬" },
+{ word: "leave", translation: "sair", emoji: "🚪" },
+{ word: "visit", translation: "visitar", emoji: "🗺️" },
+{ word: "meet", translation: "encontrar", emoji: "🤝" },
+{ word: "greet", translation: "cumprimentar", emoji: "👋" },
+{ word: "help", translation: "ajudar", emoji: "🤲" },
+{ word: "call", translation: "ligar", emoji: "📞" },
+{ word: "text", translation: "mandar mensagem", emoji: "💬" },
+{ word: "email", translation: "enviar e-mail", emoji: "📧" },
+{ word: "chat", translation: "conversar", emoji: "💬" },
+{ word: "laugh", translation: "rir", emoji: "😂" },
+{ word: "cry", translation: "chorar", emoji: "😭" },
+{ word: "shout", translation: "gritar", emoji: "📢" },
+{ word: "whisper", translation: "sussurrar", emoji: "🤫" },
+{ word: "sleep", translation: "dormir", emoji: "💤" },
+{ word: "wake up", translation: "acordar", emoji: "⏰" },
+{ word: "dream", translation: "sonhar", emoji: "💭" },
+{ word: "sing", translation: "cantar", emoji: "🎤" },
+{ word: "dance", translation: "dançar", emoji: "💃" }
+            ],
+            medium: [
+{ word: "run", translation: "correr", emoji: "🏃" },
+{ word: "walk", translation: "andar", emoji: "🚶" },
+{ word: "jump", translation: "pular", emoji: "⛹️" },
+{ word: "hide", translation: "esconder", emoji: "🤫" },
+{ word: "find", translation: "encontrar", emoji: "🔍" },
+{ word: "lose", translation: "perder", emoji: "❌" },
+{ word: "remember", translation: "lembrar", emoji: "🧠" },
+{ word: "forget", translation: "esquecer", emoji: "❌" },
+{ word: "teach", translation: "ensinar", emoji: "👩‍🏫" },
+{ word: "learn", translation: "aprender", emoji: "📚" },
+{ word: "address", translation: "endereço", emoji: "🏠" },
+{ word: "advice", translation: "conselho", emoji: "💬" },
+{ word: "answer", translation: "resposta", emoji: "✅" },
+{ word: "apology", translation: "desculpa", emoji: "🙏" },
+{ word: "appointment", translation: "compromisso", emoji: "📅" },
+{ word: "arrive", translation: "chegar", emoji: "🛬" },
+{ word: "aware", translation: "consciente", emoji: "💡" },
+{ word: "balance", translation: "equilíbrio", emoji: "⚖️" },
+{ word: "benefit", translation: "benefício", emoji: "💵" },
+{ word: "bother", translation: "incomodar", emoji: "😕" },
+{ word: "brave", translation: "corajoso", emoji: "🦸" },
+{ word: "breathe", translation: "respirar", emoji: "🌬️" },
+{ word: "broke", translation: "quebrado", emoji: "💔" },
+{ word: "bored", translation: "entediado", emoji: "😑" },
+{ word: "borrow", translation: "emprestar", emoji: "🤝" },
+{ word: "choice", translation: "escolha", emoji: "🔘" },
+{ word: "clarify", translation: "esclarecer", emoji: "🔍" },
+{ word: "collect", translation: "coletar", emoji: "📦" },
+{ word: "comment", translation: "comentário", emoji: "💬" },
+{ word: "confused", translation: "confuso", emoji: "🤯" },
+{ word: "correct", translation: "correto", emoji: "✔️" },
+{ word: "criticize", translation: "criticar", emoji: "🧐" },
+{ word: "danger", translation: "perigo", emoji: "⚠️" },
+{ word: "decide", translation: "decidir", emoji: "🤔" },
+{ word: "deny", translation: "negar", emoji: "🚫" },
+{ word: "doubt", translation: "dúvida", emoji: "🤷" },
+{ word: "enough", translation: "suficiente", emoji: "✔️" },
+{ word: "escape", translation: "escapar", emoji: "🏃‍♂️" },
+{ word: "event", translation: "evento", emoji: "🎉" },
+{ word: "exactly", translation: "exatamente", emoji: "✔️" },
+{ word: "experience", translation: "experiência", emoji: "🎓" },
+{ word: "explore", translation: "explorar", emoji: "🧭" },
+{ word: "express", translation: "expressar", emoji: "💬" },
+{ word: "familiar", translation: "familiar", emoji: "👨‍👩‍👧‍👦" },
+{ word: "feel", translation: "sentir", emoji: "😌" },
+{ word: "forget", translation: "esquecer", emoji: "❌" },
+{ word: "follow", translation: "seguir", emoji: "➡️" },
+{ word: "fool", translation: "tolo", emoji: "🤪" },
+{ word: "fortunate", translation: "afortunado", emoji: "🍀" },
+{ word: "friendly", translation: "amigável", emoji: "😊" },
+{ word: "future", translation: "futuro", emoji: "🔮" },
+{ word: "guess", translation: "adivinhar", emoji: "❓" },
+{ word: "happy", translation: "feliz", emoji: "😊" },
+{ word: "hope", translation: "esperança", emoji: "🌈" },
+{ word: "improve", translation: "melhorar", emoji: "📈" },
+{ word: "interest", translation: "interesse", emoji: "👀" },
+{ word: "invited", translation: "convidado", emoji: "🎉" },
+{ word: "job", translation: "trabalho", emoji: "💼" },
+{ word: "journey", translation: "jornada", emoji: "🚗" },
+{ word: "keep", translation: "manter", emoji: "📦" },
+{ word: "knowledge", translation: "conhecimento", emoji: "🧠" },
+{ word: "lack", translation: "falta", emoji: "❌" },
+{ word: "laugh", translation: "rir", emoji: "😂" },
+{ word: "lesson", translation: "lição", emoji: "📚" },
+{ word: "like", translation: "gostar", emoji: "❤️" },
+{ word: "listen", translation: "ouvir", emoji: "👂" },
+{ word: "look", translation: "olhar", emoji: "👀" },
+{ word: "lucky", translation: "sortudo", emoji: "🍀" },
+{ word: "manage", translation: "gerenciar", emoji: "📊" },
+{ word: "mistake", translation: "erro", emoji: "❌" },
+{ word: "move", translation: "mover", emoji: "➡️" },
+{ word: "need", translation: "precisar", emoji: "🔑" },
+{ word: "notice", translation: "notar", emoji: "👀" },
+{ word: "obtain", translation: "obter", emoji: "🏅" },
+{ word: "opinion", translation: "opinião", emoji: "🗣️" },
+{ word: "order", translation: "pedido", emoji: "🍽️" },
+{ word: "opportunity", translation: "oportunidade", emoji: "💡" },
+{ word: "pass", translation: "passar", emoji: "➡️" },
+{ word: "permanent", translation: "permanente", emoji: "🔒" },
+{ word: "possible", translation: "possível", emoji: "✔️" },
+{ word: "power", translation: "poder", emoji: "💪" },
+{ word: "prefer", translation: "preferir", emoji: "👍" },
+{ word: "prepare", translation: "preparar", emoji: "🍴" },
+{ word: "present", translation: "presente", emoji: "🎁" },
+{ word: "problems", translation: "problemas", emoji: "⚠️" },
+{ word: "promise", translation: "prometer", emoji: "🤞" },
+{ word: "question", translation: "pergunta", emoji: "❓" },
+{ word: "realize", translation: "perceber", emoji: "💡" },
+{ word: "relax", translation: "relaxar", emoji: "😌" },
+{ word: "remember", translation: "lembrar", emoji: "🧠" },
+{ word: "rely", translation: "confiar", emoji: "🤝" },
+{ word: "repeat", translation: "repetir", emoji: "🔁" },
+{ word: "rescue", translation: "resgatar", emoji: "🦸‍♂️" },
+{ word: "respect", translation: "respeitar", emoji: "🙏" },
+{ word: "responsible", translation: "responsável", emoji: "📝" },
+{ word: "review", translation: "revisar", emoji: "🔍" },
+{ word: "right", translation: "certo", emoji: "✔️" },
+{ word: "safe", translation: "seguro", emoji: "🛡️" },
+{ word: "simple", translation: "simples", emoji: "✔️" },
+{ word: "solution", translation: "solução", emoji: "💡" },
+{ word: "surprise", translation: "surpresa", emoji: "🎉" },
+{ word: "teach", translation: "ensinar", emoji: "👩‍🏫" },
+{ word: "threat", translation: "ameaça", emoji: "⚠️" },
+{ word: "trouble", translation: "problema", emoji: "⚠️" },
+{ word: "truth", translation: "verdade", emoji: "✔️" },
+{ word: "understand", translation: "entender", emoji: "🤔" },
+{ word: "use", translation: "usar", emoji: "🔧" },
+{ word: "visit", translation: "visitar", emoji: "🌍" },
+{ word: "warn", translation: "avisar", emoji: "⚠️" },
+{ word: "wish", translation: "desejar", emoji: "🎉" },
+{ word: "wonder", translation: "perguntar", emoji: "🤔" },
+{ word: "worry", translation: "preocupar", emoji: "😟" },
+{ word: "write", translation: "escrever", emoji: "✍️" },
+{ word: "accomplish", translation: "concluir", emoji: "🏆" },
+{ word: "achievement", translation: "realização", emoji: "🏅" },
+{ word: "adapt", translation: "adaptar", emoji: "🔧" },
+{ word: "alternative", translation: "alternativa", emoji: "🔄" },
+{ word: "analyze", translation: "analisar", emoji: "🔍" },
+{ word: "approach", translation: "abordagem", emoji: "🚶" },
+{ word: "argument", translation: "argumento", emoji: "🗣️" },
+{ word: "assess", translation: "avaliar", emoji: "📊" },
+{ word: "attempt", translation: "tentar", emoji: "💪" },
+{ word: "available", translation: "disponível", emoji: "📅" },
+{ word: "aware", translation: "consciente", emoji: "🧠" },
+{ word: "beneficial", translation: "benéfico", emoji: "💡" },
+{ word: "bother", translation: "incomodar", emoji: "🙄" },
+{ word: "brilliant", translation: "brilhante", emoji: "💡" },
+{ word: "calm", translation: "calmo", emoji: "😌" },
+{ word: "challenge", translation: "desafio", emoji: "🏅" },
+{ word: "clarify", translation: "esclarecer", emoji: "🔍" },
+{ word: "collaborate", translation: "colaborar", emoji: "🤝" },
+{ word: "combine", translation: "combinar", emoji: "🔗" },
+{ word: "complex", translation: "complexo", emoji: "🧩" },
+{ word: "confident", translation: "confiante", emoji: "😎" },
+{ word: "consequence", translation: "consequência", emoji: "⚖️" },
+{ word: "constant", translation: "constante", emoji: "🔄" },
+{ word: "consider", translation: "considerar", emoji: "🤔" },
+{ word: "construct", translation: "construir", emoji: "🏗️" },
+{ word: "contribute", translation: "contribuir", emoji: "🤝" },
+{ word: "critique", translation: "criticar", emoji: "🧐" },
+{ word: "debate", translation: "debater", emoji: "🗣️" },
+{ word: "demand", translation: "demanda", emoji: "📈" },
+{ word: "determine", translation: "determinar", emoji: "🎯" },
+{ word: "discover", translation: "descobrir", emoji: "🔍" },
+{ word: "diverse", translation: "diverso", emoji: "🌍" },
+{ word: "eliminate", translation: "eliminar", emoji: "❌" },
+{ word: "emphasize", translation: "enfatizar", emoji: "📌" },
+{ word: "encourage", translation: "incentivar", emoji: "💪" },
+{ word: "evaluate", translation: "avaliar", emoji: "📊" },
+{ word: "examine", translation: "examinar", emoji: "🔬" },
+{ word: "expand", translation: "expandir", emoji: "🌍" },
+{ word: "explore", translation: "explorar", emoji: "🧭" },
+{ word: "fascinate", translation: "fascinar", emoji: "🤩" },
+{ word: "focus", translation: "focar", emoji: "🔦" },
+{ word: "frequent", translation: "frequente", emoji: "📅" },
+{ word: "genuine", translation: "genuíno", emoji: "💖" },
+{ word: "goal", translation: "meta", emoji: "🎯" },
+{ word: "handle", translation: "lidar", emoji: "👐" },
+{ word: "impact", translation: "impacto", emoji: "⚡" },
+{ word: "improve", translation: "melhorar", emoji: "📈" },
+{ word: "influence", translation: "influenciar", emoji: "💭" },
+{ word: "insight", translation: "insight", emoji: "💡" },
+{ word: "innovate", translation: "inovar", emoji: "💡" },
+{ word: "inspire", translation: "inspirar", emoji: "🔥" },
+{ word: "interpret", translation: "interpretar", emoji: "🎭" },
+{ word: "investigate", translation: "investigar", emoji: "🔍" },
+{ word: "issue", translation: "problema", emoji: "⚠️" },
+{ word: "maintain", translation: "manter", emoji: "🛠️" },
+{ word: "measure", translation: "medir", emoji: "📏" },
+{ word: "motivate", translation: "motivar", emoji: "💪" },
+{ word: "necessary", translation: "necessário", emoji: "✅" },
+{ word: "neglect", translation: "negligenciar", emoji: "🚫" },
+{ word: "observe", translation: "observar", emoji: "👀" },
+{ word: "obtain", translation: "obter", emoji: "🏅" },
+{ word: "organize", translation: "organizar", emoji: "📅" },
+{ word: "overcome", translation: "superar", emoji: "💪" },
+{ word: "participate", translation: "participar", emoji: "🤝" },
+{ word: "perceive", translation: "perceber", emoji: "🔍" },
+{ word: "perform", translation: "executar", emoji: "🎭" },
+{ word: "persuade", translation: "persuadir", emoji: "🗣️" },
+{ word: "predict", translation: "prever", emoji: "🔮" },
+{ word: "prevent", translation: "prevenir", emoji: "🛡️" },
+{ word: "process", translation: "processo", emoji: "🔄" },
+{ word: "provide", translation: "fornecer", emoji: "💡" },
+{ word: "react", translation: "reagir", emoji: "⚡" },
+{ word: "recommend", translation: "recomendar", emoji: "✔️" },
+{ word: "refine", translation: "refinar", emoji: "💎" },
+{ word: "research", translation: "pesquisa", emoji: "🔬" },
+{ word: "resolve", translation: "resolver", emoji: "✔️" },
+{ word: "respond", translation: "responder", emoji: "💬" },
+{ word: "retain", translation: "manter", emoji: "📚" },
+{ word: "reveal", translation: "revelar", emoji: "🔓" },
+{ word: "satisfy", translation: "satisfazer", emoji: "😊" },
+{ word: "simplify", translation: "simplificar", emoji: "🔑" },
+{ word: "strategize", translation: "estruturar", emoji: "📊" },
+{ word: "suggest", translation: "sugerir", emoji: "💡" },
+{ word: "sustain", translation: "sustentar", emoji: "🌱" },
+{ word: "transform", translation: "transformar", emoji: "🔄" },
+{ word: "understand", translation: "entender", emoji: "🤔" }
+            ],
+            hard: [
+{ word: "unite", translation: "unir", emoji: "🤝" },
+{ word: "verify", translation: "verificar", emoji: "✔️" },
+{ word: "warrant", translation: "garantir", emoji: "🔒" },
+{ word: "weigh", translation: "pesar", emoji: "⚖️" },
+{ word: "wonder", translation: "perguntar", emoji: "🤔" },
+{ word: "worsen", translation: "piorar", emoji: "⚠️" },
+{ word: "yield", translation: "render", emoji: "🌾" },
+{ word: "accelerate", translation: "acelerar", emoji: "⚡" },
+{ word: "adaptation", translation: "adaptação", emoji: "🔄" },
+{ word: "advocate", translation: "advogar", emoji: "🎤" },
+{ word: "alleviate", translation: "aliviar", emoji: "😌" },
+{ word: "ambiguity", translation: "ambiguidade", emoji: "❓" },
+{ word: "anomaly", translation: "anomalia", emoji: "⚠️" },
+{ word: "anticipate", translation: "antecipar", emoji: "🔮" },
+{ word: "articulate", translation: "articular", emoji: "🗣️" },
+{ word: "ascertain", translation: "ascertar", emoji: "🔍" },
+{ word: "assert", translation: "afirmar", emoji: "🗣️" },
+{ word: "assimilate", translation: "assimilar", emoji: "🤔" },
+{ word: "attribute", translation: "atribuir", emoji: "🔑" },
+{ word: "bias", translation: "viés", emoji: "⚖️" },
+{ word: "catalyst", translation: "catalisador", emoji: "⚡" },
+{ word: "circumvent", translation: "contornar", emoji: "🚧" },
+{ word: "coerce", translation: "coagir", emoji: "🚫" },
+{ word: "collaborative", translation: "colaborativo", emoji: "🤝" },
+{ word: "compensate", translation: "compensar", emoji: "💵" },
+{ word: "concede", translation: "conceder", emoji: "🎟️" },
+{ word: "contemplate", translation: "contemplar", emoji: "🤔" },
+{ word: "convergence", translation: "convergência", emoji: "🔄" },
+{ word: "credibility", translation: "credibilidade", emoji: "✔️" },
+{ word: "definitive", translation: "definitivo", emoji: "✔️" },
+{ word: "delineate", translation: "delinear", emoji: "✏️" },
+{ word: "denounce", translation: "denunciar", emoji: "🚨" },
+{ word: "derive", translation: "derivar", emoji: "🔄" },
+{ word: "discrepancy", translation: "discrepância", emoji: "⚖️" },
+{ word: "disseminate", translation: "disseminar", emoji: "📡" },
+{ word: "elucidate", translation: "elucidar", emoji: "💡" },
+{ word: "emphasize", translation: "enfatizar", emoji: "📌" },
+{ word: "encompass", translation: "abranger", emoji: "🌍" },
+{ word: "engender", translation: "gerar", emoji: "💥" },
+{ word: "enhance", translation: "melhorar", emoji: "📈" },
+{ word: "enlighten", translation: "esclarecer", emoji: "💡" },
+{ word: "enumerate", translation: "enumerar", emoji: "🔢" },
+{ word: "eradicate", translation: "erradicar", emoji: "🚫" },
+{ word: "exacerbate", translation: "exacerbar", emoji: "🔥" },
+{ word: "exemplify", translation: "exemplificar", emoji: "💡" },
+{ word: "exploit", translation: "explorar", emoji: "💎" },
+{ word: "facilitate", translation: "facilitar", emoji: "🔑" },
+{ word: "feasible", translation: "viável", emoji: "✔️" },
+{ word: "fluctuate", translation: "flutuar", emoji: "🌊" },
+{ word: "foster", translation: "fomentar", emoji: "🌱" },
+{ word: "fragment", translation: "fragmento", emoji: "🧩" },
+{ word: "hypothesis", translation: "hipótese", emoji: "💭" },
+{ word: "implement", translation: "implementar", emoji: "⚙️" },
+{ word: "impose", translation: "impor", emoji: "🚫" },
+{ word: "inhibit", translation: "inibir", emoji: "✋" },
+{ word: "insightful", translation: "perspicaz", emoji: "🧠" },
+{ word: "integrate", translation: "integrar", emoji: "🔗" },
+{ word: "intensify", translation: "intensificar", emoji: "🔥" },
+{ word: "intervene", translation: "intervir", emoji: "🤔" },
+{ word: "invalidate", translation: "invalidar", emoji: "❌" },
+{ word: "manipulate", translation: "manipular", emoji: "🖤" },
+{ word: "mitigate", translation: "mitigar", emoji: "🛑" },
+{ word: "morph", translation: "mudar", emoji: "🔄" },
+{ word: "negotiate", translation: "negociar", emoji: "🤝" },
+{ word: "obfuscate", translation: "obfuscar", emoji: "🌫️" },
+{ word: "obligate", translation: "obrigar", emoji: "⚖️" },
+{ word: "overwhelm", translation: "sobrecarregar", emoji: "🌪️" },
+{ word: "perpetuate", translation: "perpetuar", emoji: "🔁" },
+{ word: "persevere", translation: "perseverar", emoji: "💪" },
+{ word: "postulate", translation: "postular", emoji: "📚" },
+{ word: "propagate", translation: "propagar", emoji: "🌱" },
+{ word: "reaffirm", translation: "reafirmar", emoji: "✔️" },
+{ word: "reconcile", translation: "reconciliar", emoji: "🤝" },
+{ word: "redefine", translation: "redefinir", emoji: "🔄" },
+{ word: "refine", translation: "refinar", emoji: "💎" },
+{ word: "rejuvenate", translation: "rejuvenescer", emoji: "🌱" },
+{ word: "relinquish", translation: "relinquecer", emoji: "🚪" },
+{ word: "reproach", translation: "reprovar", emoji: "😒" },
+{ word: "rescind", translation: "rescindir", emoji: "✂️" },
+{ word: "revive", translation: "reviver", emoji: "💀➡️💖" },
+{ word: "scrutinize", translation: "examinar", emoji: "🔎" },
+{ word: "segregate", translation: "segregar", emoji: "🚷" },
+{ word: "simplify", translation: "simplificar", emoji: "🔑" },
+{ word: "substantiate", translation: "substanciar", emoji: "🧠" },
+{ word: "surmount", translation: "superar", emoji: "🏔️" },
+{ word: "synthesize", translation: "sintetizar", emoji: "🧪" },
+{ word: "transform", translation: "transformar", emoji: "🔄" },
+{ word: "validate", translation: "validar", emoji: "✔️" },
+{ word: "vindicate", translation: "vindicar", emoji: "⚖️" },
+{ word: "weaken", translation: "enfraquecer", emoji: "💪❌" },
+{ word: "wield", translation: "empunhar", emoji: "🛠️" },
+{ word: "yield", translation: "render", emoji: "🌾" }
+            ]
+        };
+
+        let currentQuestion = 0;
+        let currentDifficulty = 'easy'; // Começa com palavras fáceis
+        let currentWords = wordsByDifficulty[currentDifficulty];
+        let correctAnswers = 0;
+        let totalAnswers = 0;
+
+        // Variável global para SpeechSynthesisUtterance
+        let speechUtterance = new SpeechSynthesisUtterance();
+        speechUtterance.lang = 'en-US';
+        speechUtterance.pitch = 1;
+        speechUtterance.rate = 1;
+
+        // Atualiza a pergunta com base na dificuldade
+        function updateQuestion() {
+            const { word, translation } = currentWords[currentQuestion];
+            document.getElementById('question').textContent = `Qual é a tradução da palavra: ${word}`;
+            document.getElementById('difficulty').textContent = `Nível: ${capitalizeFirstLetter(currentDifficulty)}`;
+
+            const incorrectAnswers = currentWords
+                .filter(w => w.translation !== translation)
+                .map(w => w.translation)
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+
+            const options = shuffleArray([translation, ...incorrectAnswers]);
+
+            const optionsList = document.getElementById('options');
+            optionsList.innerHTML = '';
+
+            options.forEach(option => {
+                const li = document.createElement('li');
+                li.innerHTML = `<div style="font-size: 2em;">${getEmoji(option)}</div> ${option}`;
+                li.onclick = () => checkAnswer(option, translation);
+                optionsList.appendChild(li);
+            });
+
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('next-button').disabled = true;
+        }
+
+        // Função para capitalizar a primeira letra da palavra
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        // Retorna o emoji correspondente
+        function getEmoji(option) {
+            const word = currentWords.find(w => w.translation === option);
+            return word ? word.emoji : "";
+        }
+
+        // Reproduz a palavra
+        function playAudio() {
+            speechUtterance.text = currentWords[currentQuestion].word;
+            speechSynthesis.speak(speechUtterance);
+        }
+
+        // Verifica se a resposta está correta
+        function checkAnswer(answer, correctAnswer) {
+            const feedback = document.getElementById('feedback');
+            document.querySelectorAll('.options li').forEach(li => {
+                if (li.textContent.includes(answer)) {
+                    li.classList.add(answer === correctAnswer ? 'correct' : 'incorrect');
+                }
+            });
+
+            feedback.textContent = answer === correctAnswer ? "Correto! ✅" : "Errado. ❌ Tente novamente!";
+            playResponse(answer === correctAnswer);
+            if (answer === correctAnswer) {
+                correctAnswers++;
+            }
+            totalAnswers++;
+            document.getElementById('next-button').disabled = false;
+        }
+
+        // Avança para a próxima pergunta
+        function nextQuestion() {
+            currentQuestion = (currentQuestion + 1) % currentWords.length;
+
+            if (currentQuestion === 0) {
+                // Aumenta a dificuldade após completar uma lista
+                if (currentDifficulty === 'easy') {
+                    currentDifficulty = 'medium';
+                    currentWords = wordsByDifficulty[currentDifficulty];
+                } else if (currentDifficulty === 'medium') {
+                    currentDifficulty = 'hard';
+                    currentWords = wordsByDifficulty[currentDifficulty];
+                }
+
+                showLevelUpNotice();
+            }
+
+            // Se todas as perguntas do nível foram respondidas, exibe o resultado final
+            if (currentQuestion === 0 && currentDifficulty === 'hard') {
+                showFinalResult();
+            } else {
+                updateQuestion();
+                showPerformance();
+                playAudio();
+            }
+        }
+
+        // Exibe o balão de aviso quando o nível aumenta
+        function showLevelUpNotice() {
+            const notice = document.getElementById('level-up-notice');
+            notice.style.display = 'block';
+            setTimeout(() => {
+                notice.style.display = 'none';
+            }, 3000);
+        }
+
+        // Exibe o desempenho atual
+        function showPerformance() {
+            const performance = document.getElementById('performance');
+            const accuracy = Math.round((correctAnswers / totalAnswers) * 100);
+            let performanceClass = 'high';
+            if (accuracy < 50) {
+                performanceClass = 'low';
+            } else if (accuracy < 75) {
+                performanceClass = 'medium';
+            }
+
+            performance.textContent = `Desempenho: ${correctAnswers} acertos de ${totalAnswers} (${accuracy}%)`;
+            performance.className = `performance ${performanceClass}`;
+        }
+
+        // Fala se a resposta está certa ou errada
+        function playResponse(isCorrect) {
+            const utterance = new SpeechSynthesisUtterance(isCorrect ? 'Correto!' : 'Errado!');
+            utterance.lang = 'pt-BR';
+            speechSynthesis.speak(utterance);
+        }
+
+        // Exibe o resultado final
+        function showFinalResult() {
+            const finalResult = document.getElementById('final-result');
+            finalResult.style.display = 'block';
+            document.getElementById('performance').style.display = 'none';
+            document.getElementById('next-button').style.display = 'none';
+            document.getElementById('question').style.display = 'none';
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('level-up-notice').style.display = 'none';
+
+            const accuracy = Math.round((correctAnswers / totalAnswers) * 100);
+            document.getElementById('final-performance').textContent = `Desempenho final: ${correctAnswers} acertos de ${totalAnswers}`;
+            document.getElementById('final-accuracy').textContent = `Precisão: ${accuracy}%`;
+        }
+
+        // Reinicia o jogo
+        document.getElementById('restart-button').onclick = () => {
+            window.location.reload();
+        };
+
+        // Função para embaralhar as opções
+        function shuffleArray(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // Inicializa o jogo
+        updateQuestion();
+        playAudio();
+
+        document.getElementById('repeat-button').onclick = playAudio;
+        document.getElementById('next-button').onclick = nextQuestion;
+    </script>
+</body>
+</html>
