@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Inglês</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+            font-size: 24px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        .option, .question-btn {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .option {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .option:hover {
+            background-color: #45a049;
+        }
+        .question-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .question-btn:hover {
+            background-color: #1976D2;
+        }
+        .feedback {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .animate {
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container animate">
+        <h1>🎮 Aprenda Inglês Brincando! 🇬🇧</h1>
+        <p id="question">Clique no botão para ouvir a pergunta 🎤</p>
+        <button class="question-btn" onclick="playQuestion()">🔊 Ouvir Pergunta</button>
+        <div id="options"></div>
+        <p id="feedback" class="feedback"></p>
+    </div>
+    
+    <script>
+const questions = [
+    { question: "How are you?", options: ["😊 I'm fine", "👋 Goodbye", "🙏 Thank you"], answer: "😊 I'm fine" },
+    { question: "What is your name?", options: ["🙋‍♂️ My name is John", "🔟 I am 10 years old", "🍏 I like apples"], answer: "🙋‍♂️ My name is John" },
+    { question: "Where are you from?", options: ["🇧🇷 I am from Brazil", "🏃 I like to run", "☀️ It is sunny"], answer: "🇧🇷 I am from Brazil" },
+    { question: "What color is the sky?", options: ["🌞 Blue", "🍏 Green", "🍎 Red"], answer: "🌞 Blue" },
+    { question: "How old are you?", options: ["🔟 I am 10 years old", "🍏 I like apples", "🏃 I like to run"], answer: "🔟 I am 10 years old" },
+    { question: "What is your favorite food?", options: ["🍕 Pizza", "🍎 Apple", "🍔 Hamburger"], answer: "🍕 Pizza" },
+    { question: "What do you like to do?", options: ["🏃 I like to run", "📚 I like to read", "🍏 I like apples"], answer: "🏃 I like to run" },
+    { question: "What is your favorite animal?", options: ["🐶 Dog", "🐱 Cat", "🐘 Elephant"], answer: "🐶 Dog" },
+    { question: "What is the weather like?", options: ["☀️ It is sunny", "🌧️ It is raining", "🌨️ It is snowing"], answer: "☀️ It is sunny" },
+    { question: "What is your favorite color?", options: ["🔴 Red", "🟢 Green", "🔵 Blue"], answer: "🔴 Red" },
+    { question: "How do you feel today?", options: ["😊 I'm happy", "😢 I'm sad", "😡 I'm angry"], answer: "😊 I'm happy" },
+    { question: "What is your hobby?", options: ["🎮 I like to play video games", "📚 I like to read books", "🎨 I like to draw"], answer: "🎮 I like to play video games" },
+    { question: "What is your favorite season?", options: ["🌞 Summer", "🍂 Autumn", "❄️ Winter"], answer: "🌞 Summer" },
+    { question: "What time of day is it?", options: ["🌅 Morning", "🌞 Noon", "🌙 Night"], answer: "🌅 Morning" },
+    { question: "What is the capital of France?", options: ["🇫🇷 Paris", "🇺🇸 Washington D.C.", "🇬🇧 London"], answer: "🇫🇷 Paris" },
+    { question: "What is the opposite of hot?", options: ["❄️ Cold", "🔥 Hot", "💨 Windy"], answer: "❄️ Cold" },
+    { question: "What is the opposite of big?", options: ["📏 Small", "⚡ Fast", "💨 Light"], answer: "📏 Small" },
+    { question: "What do you do in the morning?", options: ["☕ Drink coffee", "🌙 Sleep", "🍎 Eat an apple"], answer: "☕ Drink coffee" },
+    { question: "What do you do at night?", options: ["🌙 Sleep", "🌞 Work", "🍏 Eat an apple"], answer: "🌙 Sleep" },
+    { question: "What is your favorite sport?", options: ["⚽ Football", "🏀 Basketball", "🎾 Tennis"], answer: "⚽ Football" },
+    { question: "What do you like to drink?", options: ["🥛 Milk", "🍷 Wine", "🍺 Beer"], answer: "🥛 Milk" },
+    { question: "What is the opposite of happy?", options: ["😢 Sad", "😀 Excited", "😂 Funny"], answer: "😢 Sad" },
+    { question: "What is the opposite of fast?", options: ["🐢 Slow", "🏃 Fast", "🦸‍♂️ Super fast"], answer: "🐢 Slow" },
+    { question: "Where do you live?", options: ["🏠 I live in a house", "🏢 I live in an apartment", "🌍 I live on Earth"], answer: "🏠 I live in a house" },
+    { question: "What do you want to be?", options: ["👩‍⚕️ A doctor", "👨‍🎤 A musician", "👨‍🏫 A teacher"], answer: "👩‍⚕️ A doctor" },
+    { question: "What do you use to write?", options: ["✏️ A pencil", "🖋️ A pen", "🖥️ A computer"], answer: "✏️ A pencil" },
+    { question: "What is your favorite fruit?", options: ["🍎 Apple", "🍌 Banana", "🍓 Strawberry"], answer: "🍎 Apple" },
+    { question: "What is your favorite vegetable?", options: ["🥕 Carrot", "🥦 Broccoli", "🍅 Tomato"], answer: "🥕 Carrot" },
+    { question: "What do you wear in the winter?", options: ["🧥 A jacket", "👕 A t-shirt", "🩳 Shorts"], answer: "🧥 A jacket" },
+    { question: "What do you wear in the summer?", options: ["🩳 Shorts", "🧥 A jacket", "👖 Pants"], answer: "🩳 Shorts" },
+    { question: "What do you do when you are thirsty?", options: ["🍹 Drink water", "🍏 Eat an apple", "🍪 Eat a cookie"], answer: "🍹 Drink water" },
+    { question: "What do you do when you are hungry?", options: ["🍕 Eat pizza", "🥗 Eat salad", "🍏 Eat an apple"], answer: "🍕 Eat pizza" },
+    { question: "What is your favorite drink?", options: ["🥤 Juice", "🍵 Tea", "☕ Coffee"], answer: "🥤 Juice" },
+    { question: "What is your favorite ice cream flavor?", options: ["🍦 Vanilla", "🍫 Chocolate", "🍓 Strawberry"], answer: "🍦 Vanilla" },
+    { question: "What is your favorite game?", options: ["🎮 Video games", "🧩 Puzzle", "🏀 Basketball"], answer: "🎮 Video games" },
+    { question: "What do you like to wear?", options: ["👗 Dress", "👖 Jeans", "🩳 Shorts"], answer: "👗 Dress" },
+    { question: "What is your favorite subject?", options: ["📚 Math", "📖 History", "🧪 Science"], answer: "📚 Math" },
+    { question: "What do you use to read?", options: ["📚 A book", "📱 A phone", "💻 A laptop"], answer: "📚 A book" },
+    { question: "What is your favorite holiday?", options: ["🎄 Christmas", "🎃 Halloween", "🎆 New Year's Eve"], answer: "🎄 Christmas" },
+    { question: "Where do you go to learn?", options: ["🏫 A school", "🏠 Home", "🎮 A gaming center"], answer: "🏫 A school" },
+    { question: "What do you use to play music?", options: ["🎧 Headphones", "🎸 A guitar", "🎼 A piano"], answer: "🎧 Headphones" },
+    { question: "What is your favorite movie?", options: ["🎬 Action", "🎥 Animation", "🎭 Drama"], answer: "🎬 Action" },
+    { question: "What do you do with a phone?", options: ["📞 Call", "💻 Browse the internet", "📷 Take pictures"], answer: "📞 Call" },
+    { question: "What do you need to study?", options: ["📚 Books", "🎮 Video games", "🍏 Apples"], answer: "📚 Books" },
+    { question: "What is your favorite activity?", options: ["🏃 Running", "🎨 Drawing", "🎤 Singing"], answer: "🏃 Running" },
+    { question: "What is the opposite of cold?", options: ["🔥 Hot", "❄️ Cold", "🌬️ Windy"], answer: "🔥 Hot" },
+    { question: "What do you use to watch movies?", options: ["📺 A TV", "📱 A phone", "💻 A laptop"], answer: "📺 A TV" },
+    { question: "What is the color of grass?", options: ["🟢 Green", "🟡 Yellow", "🟣 Purple"], answer: "🟢 Green" },
+    { question: "What is the opposite of up?", options: ["⬇️ Down", "⬆️ Up", "➡️ Right"], answer: "⬇️ Down" },
+    { question: "What do you use to eat?", options: ["🍴 A fork", "🥄 A spoon", "🍷 A cup"], answer: "🍴 A fork" },
+    { question: "What do you need to drive?", options: ["🚗 A car", "🚲 A bicycle", "🛴 A scooter"], answer: "🚗 A car" },
+    { question: "What do you do when you feel tired?", options: ["💤 Sleep", "🍏 Eat", "🏃 Run"], answer: "💤 Sleep" },
+    { question: "What is your favorite shape?", options: ["🔵 Circle", "🟢 Square", "🔶 Triangle"], answer: "🔵 Circle" },
+    { question: "What is the color of the sun?", options: ["☀️ Yellow", "🌙 Blue", "🌧️ Gray"], answer: "☀️ Yellow" },
+    { question: "What is your favorite type of music?", options: ["🎶 Pop", "🎵 Rock", "🎼 Classical"], answer: "🎶 Pop" },
+    { question: "What is your favorite instrument?", options: ["🎸 Guitar", "🎻 Violin", "🎹 Piano"], answer: "🎸 Guitar" },
+    { question: "What is the opposite of soft?", options: ["🪨 Hard", "🛋️ Soft", "🍞 Fresh"], answer: "🪨 Hard" },
+    { question: "What do you wear on your feet?", options: ["👟 Shoes", "🧦 Socks", "🥿 Sandals"], answer: "👟 Shoes" }
+];
+
+        
+        let currentQuestion = 0;
+
+        function playQuestion() {
+            let utterance = new SpeechSynthesisUtterance(questions[currentQuestion].question);
+            utterance.lang = "en-US";
+            speechSynthesis.speak(utterance);
+            showOptions();
+        }
+
+        function showOptions() {
+            document.getElementById("question").textContent = questions[currentQuestion].question;
+            let optionsDiv = document.getElementById("options");
+            optionsDiv.innerHTML = "";
+            questions[currentQuestion].options.forEach(option => {
+                let button = document.createElement("button");
+                button.textContent = option;
+                button.className = "option animate";
+                button.onclick = () => checkAnswer(option);
+                optionsDiv.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selected) {
+            let feedback = document.getElementById("feedback");
+            if (selected === questions[currentQuestion].answer) {
+                feedback.textContent = "✅ Correto!";
+                feedback.style.color = "green";
+            } else {
+                feedback.textContent = "❌ Tente novamente!";
+                feedback.style.color = "red";
+                return;
+            }
+            setTimeout(() => {
+                currentQuestion = (currentQuestion + 1) % questions.length;
+                feedback.textContent = "";
+                playQuestion();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
